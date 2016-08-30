@@ -10,6 +10,9 @@ app.directive('navbar', function ($state, $location) {
         var path = $location.path();
         return path.startsWith(partial);
       };
+      scope.logout = function(state){
+        $http.get('/logout');      ------------ stopped right here!!!!
+      }
     }
   }
 });
