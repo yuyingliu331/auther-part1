@@ -21,25 +21,39 @@ app.use(require('./logging.middleware'));
 app.use(require('./request-state.middleware'));
 
 app.post('/login', function (req, res, next) {
+  console.log("this is req.body", req.body);
   User.findOne({
     where: req.body
   })
   .then(function (user) {
-  	console.log("user:",  user);
-	if (!user) {
-		console.log("no user:", user);
+    console.log("this is the user", user);
+	   if (!user) {
        res.sendStatus(401);
     }else{
-    	console.log("has user:", user);
       req.session.userId = user.id;
-      res.sendStatus(204);
+      console.log("this is the session userId", req.session.userId);
+      //how to send status 204?
+      res.send(user);
     }
   })
   .catch(next);
 });
 
 app.get('/logout', function(req, res, next) {
-	res.redirect('/login');
+  req.session = null;
+  res.sendStatus(200);
+});
+
+app.get('/auth/me', function(req, res, next) {
+  User.findOne({
+    where: req.session.userId
+  }).then(function(user) {
+    if (!user) {
+      res.sendStatus(401);
+    }
+    res.send(user);
+  })
+  .catch(next);
 });
 
 app.use('/api', require('../api/api.router'));
